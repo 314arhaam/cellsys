@@ -18,7 +18,7 @@ Example:
 Build an 8x8 mixed phospholipid bilayer, containing DPPC and DMPC lipids.
 """
 # specify monomers
-monomers = ["DPPC", "DPPS"]
+monomers = ["DPP", "DPS"]
 
 # upper and lower composition
 comp_upper = [32, 32]
@@ -30,7 +30,7 @@ membrane = cellsys.bilayer(8, 8, "charmm36")
 for monomer in monomers:
     membrane.load_monomer(monomer)
 
-membrane.make(2, 4, comp_upper, comp_lower) # spaing, thickness, upper and lower composition
+membrane.make(2., 4., comp_upper, comp_lower) # spaing, thickness, upper and lower composition
 # write output in a *.gro file
 membrane.write_gro()
 # generate topology file (*.top)
