@@ -3,6 +3,7 @@ An open-source tool for building initial structures for bio-membranes and drug-d
 📝 Paper: https://onlinelibrary.wiley.com/doi/10.1002/jcc.26793
 
 ## Introduction
+### Purpose
 This Python-based open-source package is designed to make the process of initial structure generation for drug-delivery systems easier.  
 Focusing on:
 1. Phospholipid bi- and mono- layers
@@ -10,6 +11,21 @@ Focusing on:
 3. Liposomes
 
 Built-in utility tools and file formats are currently based on [GROMACS](https://www.gromacs.org/) software.
+
+### Data
+CellSys needs the following data to build initial structures:
+1. `[ moleculetype ]` and `[ atom ]` names based on an `*.itp` file.
+2. xyz-Coordinate of the residue, as a `numpy` array. (`*.npy` file)
+
+To add a new forcefield, put above data in a folder and add to `cellsys_data` directory. If correct, it will be appeared after importing CellSys in `python`.
+
+### How to use
+1. Download `main` folder and copy in a directory.
+2. 💻 **Terminal Mode**: Open `python` in the directory and `import cellsys`  
+Or  
+2. 📝 **Script Mode**: Run your desired commands as a `python` script.
+
+
 ## Example
 ```python
 import cellsys
@@ -35,6 +51,11 @@ membrane.make(2., 4., comp_upper, comp_lower) # spaing, thickness, upper and low
 membrane.write_gro()
 # generate topology file (*.top)
 cellsys.utills.gmx.make_topology(membrane)
+```
+
+Also, systems.py could be run inside Linux/Unix Terminal or Windows Command Prompt.
+```shell
+$ python systems.py
 ```
 ## Result
 Rendered visualization of the membrane, made using [VMD](https://www.ks.uiuc.edu/Research/vmd/) software.
