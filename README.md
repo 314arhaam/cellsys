@@ -8,6 +8,8 @@ Focusing on:
 1. Phospholipid bi- and mono- layers
 2. Micelles
 3. Liposomes
+
+Built-in utility tools and file formats are currently based on [GROMACS](https://www.gromacs.org/) software.
 ## Example
 ```python
 import cellsys
@@ -16,11 +18,11 @@ Example:
 Build an 8x8 mixed phospholipid bilayer, containing DPPC and DMPC lipids.
 """
 # specify monomers
-monomers = ["DPPC", "DMPC"]
+monomers = ["DPPC", "DPPS"]
 
 # upper and lower composition
-comp_upper = [40, 24]
-comp_lower = [32, 32]
+comp_upper = [32, 32]
+comp_lower = [64, 0]
 
 # make bilayer object, based on "CHARMM36" forcefield data
 membrane = cellsys.bilayer(8, 8, "charmm36")
@@ -34,3 +36,8 @@ membrane.write_gro()
 # generate topology file (*.top)
 cellsys.utills.gmx.make_topology(membrane)
 ```
+## Result
+Rendered visualization of the membrane, made using [VMD](https://www.ks.uiuc.edu/Research/vmd/) software.
+<p align="center">
+  <img src="https://github.com/314arhaam/cellsys/blob/main/graphics/dppc-dpps.png" width="500" title="DPPC/DPPS membrane">
+</p>
