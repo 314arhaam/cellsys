@@ -41,3 +41,20 @@ Rendered visualization of the membrane, made using [VMD](https://www.ks.uiuc.edu
 <p align="center">
   <img src="https://github.com/314arhaam/cellsys/blob/main/graphics/dppc-dpps.png" width="400" title="DPPC/DPPS membrane">
 </p>
+
+## Citation
+```
+@article{https://doi.org/10.1002/jcc.26793,
+author = {Abbasi, Ali and Amjad-Iranagh, Sepideh and Dabir, Bahram},
+title = {CellSys: An open-source tool for building initial structures for bio-membranes and drug-delivery systems},
+journal = {Journal of Computational Chemistry},
+volume = {43},
+number = {5},
+pages = {331-339},
+keywords = {cell membranes, molecular dynamics simulations, phospholipid membranes, python programming language},
+doi = {https://doi.org/10.1002/jcc.26793},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.26793},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/jcc.26793},
+year = {2022}
+}
+```
