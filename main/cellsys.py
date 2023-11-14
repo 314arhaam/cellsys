@@ -87,15 +87,13 @@ class component:
         n_atoms : list
             number of the atoms
     """
-    def __init__(self,forcefield="charmm36"):
-        self.forcefield=forcefield
-        self.coords=dict()
-        self.monomer=dict()
-        self.composition=dict()
-        self.residue_name=[]
-        self.box=[10.,10.,10.]
-        self.filename='cellsys-%s.gro'
-        self.name="generic-component"
+    def __init__(self, forcefield: str = "charmm36") -> None:
+        self.forcefield = forcefield
+        self.coords, self.monomer, self.composition = {}, {}, {}
+        self.residue_name = []
+        self.box = [10., 10., 10.]
+        self.filename = 'cellsys-%s.gro'
+        self.name = "generic-component"
         #self.database=[]#
         #self.data=dict()#
         #self.ffresname=[]#
@@ -108,18 +106,20 @@ class component:
         else:
             raise KeyError("forcefield %s doesn't exist, available files: %s"%(forcefield, [i for i in os.listdir('data/forcefield/') if '.csv' in i]))
         '''
-    def __repr__(self):
-        repr=self.name
+    
+    def __repr__(self) -> str:
+        repr = self.name
         for section in self.coords:
-            repr+="\n"+" "*4+section
+            repr += "\n" + " "*4 + section
             for stack in self.residue_name:
                 try:
-                    n=len(self.coords[section][stack])
+                    n = len(self.coords[section][stack])
                 except KeyError:
-                    n=0
-                repr+="\n"+" "*4*2+stack+"%3d"%(n)
+                    n = 0
+                repr += "\n" + " "*4*2 + stack+"%3d"%(n)
         return repr
-    def load_monomer(self,resname):
+    
+    def load_monomer(self, resname: str) -> None:
         """Load monomer xyz-coords and forcefield atom names to create membrane
         Args:
             rensame (str): residue name or molecule name.
@@ -131,8 +131,8 @@ class component:
         try:
             # PACK-DATA: read coordinates of monomer/residue from a numpy array
             # default residue structure is coordinates of its atoms.
-            #mols=[i for i in os.listdir('data/structure/') if '.npy' in i]
-            #res=[mol for mol in mols if resname in mol]
+            # mols=[i for i in os.listdir('data/structure/') if '.npy' in i]
+            # res=[mol for mol in mols if resname in mol]
             try:
                 numpy_coords=np.load('cellsys_data/'+self.forcefield+'/'+resname+'.npy')
             except FileNotFoundError:
@@ -148,11 +148,11 @@ class component:
             # ffresname is name of the residues based on the forcefield.
             # same residues may have different names in different forcefields
             # the 2nd row in data.csv is ffresname = _atom_types[resname][0]
-            #self.ffresname.append(self._atom_types[resname][0])
+            # self.ffresname.append(self._atom_types[resname][0])
             # data file is actually the [atomtypes]
-            #self.data[resname]=self._atom_types[resname][1:].dropna()
+            # self.data[resname]=self._atom_types[resname][1:].dropna()
             # number of atoms in each residue; an important parameter
-            #self.number_of_atoms=[self.monomer[res].shape[0] for res in self.residue_name]
+            # self.number_of_atoms=[self.monomer[res].shape[0] for res in self.residue_name]
             ### finished ###
             print("monomer added: %s\n"%(resname))
             self.__repr__()
@@ -160,18 +160,18 @@ class component:
             print("404 Error!\nAvailable monomers:")
             print([i[:-4] for i in os.listdir('data/structure/') if '.npy' in i])
         return None
-    def read_gro(self,filename):# not finished ; experimental
-        gro_file=open(filename,"r")
-        gro_text=gro_file.read()
+    
+    # not finished ; experimental
+    def read_gro(self, filename: str) -> int:
+        gro_file = open(filename, "r")
+        gro_text = gro_file.read()
         gro_file.close()
-        data=dict()
-        data["residue_number"]=[]
-        data["residue_name"]=[]
-        data["atom_name"]=[]
-        data["atom_number"]=[]
-        data["x"]=[]
-        data["y"]=[]
-        data["z"]=[]
+        data = {}
+        data["residue_number"] = []
+        data["residue_name"] = []
+        data["atom_name"] = []
+        data["atom_number"] = []
+        data["x"], data["y"], data["z"] = [], [], []
         for line in gro_text.split("\n")[2:-2]:
             data["residue_number"].append(line[:5])
             data["residue_name"].append(line[5:10])
@@ -181,31 +181,34 @@ class component:
             data["y"].append(float(line[28:36]))
             data["z"].append(float(line[36:44]))
         self.ffresname=data["residue_name"]
-        self.coords["generic"]=dict()
+        self.coords["generic"] = {}
         self.residue_name.append("whole")
-        data=pd.DataFrame(data)
-        self.coords["generic"]["whole"]=np.expand_dims(np.array(data[["x","y","z"]]),0)
+        data = pd.DataFrame(data)
+        self.coords["generic"]["whole"] = np.expand_dims(np.array(data[["x", "y", "z"]]), 0)
         return 0
-    def trim(self,func):
-        new_coords=self.coords.copy()
-        new_composition=self.composition.copy()
+    
+    def trim(self, func) -> None:
+        new_coords = self.coords.copy()
+        new_composition = self.composition.copy()
         for section in self.coords:
             for stack in self.coords[section]:
-                mask=func(self.coords[section][stack][:,:,0],
-                          self.coords[section][stack][:,:,1],
-                          self.coords[section][stack][:,:,2]).all(1)
-                new_coords[section][stack]=self.coords[section][stack][mask,:,:]
-                new_composition[section]=mask.shape[0]
-        self.coords=new_coords
-        self.composition=new_composition
+                mask = func(self.coords[section][stack][:, :, 0],
+                            self.coords[section][stack][:, :, 1],
+                            self.coords[section][stack][:, :, 2]).all(1)
+                new_coords[section][stack] = self.coords[section][stack][mask, :, :]
+                new_composition[section] = mask.shape[0]
+        self.coords = new_coords
+        self.composition = new_composition
         # `self.update` was here
-    def toDataFrame(self):
+        return None
+    
+    def toDataFrame(self) -> pd.DataFrame:
         """
         Make a dataframe containing" x,y,z,section,stack,atomname
         """
-        data_dict=dict()
-        data_dict["x"],data_dict["y"],data_dict["z"]=[],[],[]
-        data_dict["atom"],data_dict["stack"],data_dict["section"]=[],[],[]
+        data_dict = {}
+        data_dict["x"], data_dict["y"], data_dict["z"] = [], [], []
+        data_dict["atom"], data_dict["stack"], data_dict["section"] = [], [], []
         for section in self.coords:
             for stack in self.coords[section]:
                 for molecule in self.coords[section][stack]:
@@ -216,8 +219,9 @@ class component:
                         data_dict["atom"].append(force_data[self.forcefield][stack][i+1])#self.data[stack][i+1])
                         data_dict["stack"].append(stack)
                         data_dict["section"].append(section)
-        return pd.DataFrame(data=data_dict)
-    def make_grid(self,min_dist,nX,nY):
+        return pd.DataFrame(data = data_dict)
+    
+    def make_grid(self, min_dist: float, nX: int, nY: int) -> np.array:
         """Mathematically a membrane is an n*m matrix of monomers.
         this method makes a nX*nY grid with equal manhattan-distance `min_dist`
         between 2 adjacent elements.
@@ -231,23 +235,25 @@ class component:
         Note:
             In future versions, z-axis will be considered.
         """
-        grid_matrix=[[i*min_dist,j*min_dist,0]  for i in range(nX)
-                                                for j in range(nY)]
-        grid_matrix=np.array(grid_matrix)
+        grid_matrix = [[i*min_dist,j*min_dist,0]  for i in range(nX)
+                       for j in range(nY)]
+        grid_matrix = np.array(grid_matrix)
         return grid_matrix
-    def all_coords(self):
+    
+    def all_coords(self) -> np.array:
         """Show xyz-coords of all atoms as an M*N matrix
 
         Returns:
             np.array
         """
-        coords=[]
+        coords = []
         for section in self.coords:
             for stack in self.coords[section]:
-                x,y,_=self.coords[section][stack].shape
+                x, y, _ = self.coords[section][stack].shape
                 coords.append(self.coords[section][stack].reshape(x*y,3))
-        return np.concatenate(coords,axis=0)
-    def set_coords(self,new_coords):
+        return np.concatenate(coords, axis = 0)
+    
+    def set_coords(self, new_coords) -> None:
         """Change the values of `coords` attribute to new_coords
 
         Args:
@@ -262,37 +268,39 @@ class component:
                 indicating that exact number of the monomers in the upper-
                 section exist in lower section.
         """
-        coords_temp=dict()
+        coords_temp = {}
         coords_temp.fromkeys(self.coords)
-        before=0
+        before = 0
         for k,resname in enumerate(self.residue_name):
             for j in self.coords: #self.coords
                 #chunk_len=self.composition[j][k]*self.number_of_atoms[k] 
-                chunk_len=self.composition[j][k]*len(force_data[self.forcefield][self.residue_name[k]])
-                x,y,_=self.coords[j][resname].shape
-                self.coords[j][resname]=(new_coords[before:before+chunk_len,:]).reshape(x,y,3)
-                before+=chunk_len
+                chunk_len = self.composition[j][k]*len(force_data[self.forcefield][self.residue_name[k]])
+                x, y, _ = self.coords[j][resname].shape
+                self.coords[j][resname] = (new_coords[before:before+chunk_len,:]).reshape(x,y,3)
+                before += chunk_len
         # `self.update` was here
-        return 0
-    def fit_box(self,delta_h=5):
+        return None
+    
+    def fit_box(self, delta_h: float = 5.) -> None:
         """Fit a simulation box
         """
-        c=[]
-        section=list(self.coords.keys())[0]
+        c = []
+        section = list(self.coords.keys())[0]
         for stack in self.coords[section]:
-            temp=self.coords[section][stack]
-            nX,nY,_=temp.shape
-            c.append(temp.reshape(nX*nY,3))
-        m=np.concatenate(c,axis=0)
-        self.box=m.max(0)-m.min(0)
-        self.box[2]=delta_h*1.5
+            temp = self.coords[section][stack]
+            nX, nY, _ = temp.shape
+            c.append(temp.reshape(nX*nY, 3))
+        m = np.concatenate(c, axis = 0)
+        self.box = m.max(0) - m.min(0)
+        self.box[2] = delta_h * 1.5
         '''
         mean_box=self.all_coords().mean(0)
         vec=self.box/2-mean_box
         self.translate(vec)
         '''
-        return 0
-    def write_gro(self):
+        return None
+    
+    def write_gro(self) -> None:
         # `self.update` was here
         filename=self.filename#%(self.name)
         print("writing data to %s"%(filename))
@@ -316,7 +324,8 @@ class component:
         final_membrane=open(address, 'w')
         final_membrane.write(gro_file)
         final_membrane.close()
-        return 0
+        return None
+    
     def translate(self,vector):
         """Translate all monomers-based cartesian translation
 
