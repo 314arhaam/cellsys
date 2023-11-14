@@ -325,7 +325,7 @@ class component:
         final_membrane.write(gro_file)
         final_membrane.close()
         return None
-    
+    ###
     def translate(self,vector):
         """Translate all monomers-based cartesian translation
 
