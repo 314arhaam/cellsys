@@ -394,52 +394,56 @@ class membrane(component):
         return self.voronoi_plots
     def membrane_map(self):
         number_of_sections=len(self.voronoi_plots)
-        _,ax=plt.subplots(number_of_sections)
-        if number_of_sections==1:
-            ax=[ax]
-        for i,vplot in enumerate(self.voronoi_plots):
-            voronoi_plot_2d(vplot,ax=ax[i])
+        _,ax = plt.subplots(number_of_sections)
+        if number_of_sections == 1:
+            ax = [ax]
+        for i, vplot in enumerate(self.voronoi_plots):
+            voronoi_plot_2d(vplot, ax = ax[i])
         plt.show()
         return 0
-    def compress(self,vector=np.array([[0.1,0.1,0]])):
+    
+    def compress(self,vector = np.array([[0.1, 0.1, 0]])):
         for section in self.coords.keys():
-            for i,stack in enumerate(self.coords[section]):
+            for i, stack in enumerate(self.coords[section]):
                 if self.composition[section][i]:
-                    coords=self.coords[section][stack]
-                    coords-=np.expand_dims(coords.mean(1),1)*vector
-                    self.coords[section][stack]=coords
+                    coords = self.coords[section][stack]
+                    coords -= np.expand_dims(coords.mean(1), 1) * vector
+                    self.coords[section][stack] = coords
         # `self.update` was here
         return 0
 
 class monolayer(membrane):
-    def __init__(self,nX,nY,forcefield):
-        super().__init__(nX,nY,forcefield)
-    def make(self,vector,comp,name="main_layer"):
-        if type(vector) in {float,int}:
-            vector=self.make_grid(vector,self.nX,self.nY)
-        self.composition[name]=comp
-        self.coords[name]=self.assemble(vector,comp,z=1)
+    def __init__(self,nX,nY,forcefield) -> None:
+        super().__init__(nX, nY, forcefield)
+    
+    def make(self, vector, comp, name = "main_layer") -> None:
+        if type(vector) in {float, int}:
+            vector = self.make_grid(vector, self.nX, self.nY)
+        self.composition[name] = comp
+        self.coords[name] = self.assemble(vector,comp, z = 1)
         self.fit_box(delta_h=5.0)
         # `self.update` was here
-        n=''
+        n = ''
         for i in range(len(self.residue_name)):
-            N=0
+            N = 0
             for j in self.coords:
-                N+=self.composition[j][i]
-            n=n+str(N)+'-'
-        self.filename=['[P]-','[M]-'][len(self.residue_name)>1]+self.name+n[:-1]+'.gro'
-        os.system("mkdir CellSys-%s"%(self.filename[:-4]))
-        return 0
+                N += self.composition[j][i]
+            n = n + str(N) + '-'
+        self.filename = f"{['[P]-', '[M]-'][len(self.residue_name)>1]+self.name+n[: -1]:s}.gro"
+        os.system(f"mkdir CellSys-{self.filename[:-4]:s}")
+        return None
 
 class bilayer(membrane):
-    def __init__(self,nX,nY,forcefield):
-        super().__init__(nX,nY,forcefield)
-    def apl(self,h):
+    def __init__(self, nX, nY, forcefield):
+        super().__init__(nX, nY, forcefield)
+    
+    def apl(self, h):
         """
         """
         thickness=self.thickness()
         self.fit_box(delta_h=thickness)
         return np.prod(self.box[:2])/(self.nX*self.nY)*100.0
+    
     def make(self,vector,z_dist,comp_upper=None,comp_lower=None):
         if type(vector) in {float,int}:
             vector=self.make_grid(vector,self.nX,self.nY)
