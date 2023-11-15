@@ -361,35 +361,35 @@ class membrane(component):
         Returns:
             coords: coordinates of atoms in a section assembly
         """
-        if comp==None:
-            comp=[1*int(self.nX*self.nY)]
-        coords,xyz=dict(),0
-        index=[*range(self.nX*self.nY)]
+        if comp == None:
+            comp = [1*int(self.nX*self.nY)]
+        coords, xyz = {}, 0
+        index = [*range(self.nX*self.nY)]
         np.random.shuffle(index)
         vector=vector[index]
-        for i,n in enumerate(comp):
+        for i, n in enumerate(comp):
             if n:
-                res=self.residue_name[i]
+                res = self.residue_name[i]
                 #I,J=np.ones([self.number_of_atoms[i],1]), np.ones([n,1]) # len(force_data[self.forcefield][self.residue_name[k]])
-                I,J=np.ones([len(force_data[self.forcefield][self.residue_name[i]]),1]), np.ones([n,1])
-                xyz=np.kron(J,self.monomer[res])+np.kron(vector[:n],I)
+                I,J = np.ones([len(force_data[self.forcefield][self.residue_name[i]]),1]), np.ones([n,1])
+                xyz = np.kron(J,self.monomer[res])+np.kron(vector[:n],I)
                 #xyz=xyz.reshape(n,self.number_of_atoms[i],3) # len(force_data[self.forcefield][self.residue_name[k]])
-                xyz=xyz.reshape(n,len(force_data[self.forcefield][self.residue_name[i]]),3)
+                xyz = xyz.reshape(n,len(force_data[self.forcefield][self.residue_name[i]]),3)
                 coords[self.residue_name[i]]=xyz
-                vector=vector[n:,:]
+                vector = vector[n:, :]
             else:
-                coords[self.residue_name[i]]=np.zeros((0,0,3))
-        self.name="[%s]-[PY]"%('-'.join(self.residue_name))
+                coords[self.residue_name[i]] = np.zeros((0,0,3))
+        self.name = "[%s]-[PY]"%('-'.join(self.residue_name))
         if z:
-            temp=dict()
+            temp = {}
             for resname in coords:
-                temp[resname]=(coords[resname]-np.array([[[0,0,z]]]))*np.array([[[1,1,-1]]])
-            coords=temp
+                temp[resname] = (coords[resname] - np.array([[[0, 0, z]]]))*np.array([[[1, 1, -1]]])
+            coords = temp
         return coords
     def voronoi(self):
         for section in self.coords:
-            cg=np.concatenate(tuple(self.coords[section][resname].mean(1)[:,:2]
-                                                for resname in self.residue_name))
+            cg = np.concatenate(tuple(self.coords[section][resname].mean(1)[:, :2]
+                                      for resname in self.residue_name))
             self.voronoi_plots.append(Voronoi(cg))
         return self.voronoi_plots
     def membrane_map(self):
