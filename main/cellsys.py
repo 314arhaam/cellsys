@@ -11,8 +11,8 @@ from scipy.spatial import Voronoi
 from scipy.spatial import voronoi_plot_2d
 from scipy.spatial.transform import Rotation as rot
 
-force_data={}
-bonds_data={}
+force_data = {}
+bonds_data = {}
 package_banner=r"""
 
          ██████╗███████╗██╗     ██╗     ███████╗██╗   ██╗███████╗
@@ -444,27 +444,28 @@ class bilayer(membrane):
         self.fit_box(delta_h=thickness)
         return np.prod(self.box[:2])/(self.nX*self.nY)*100.0
     
-    def make(self,vector,z_dist,comp_upper=None,comp_lower=None):
+    def make(self,vector, z_dist, comp_upper=None, comp_lower=None):
         if type(vector) in {float,int}:
             vector=self.make_grid(vector,self.nX,self.nY)
         if sum(comp_lower)!=self.nX*self.nY or sum(comp_upper)!=self.nX*self.nY:
             warnings.warn("There is a hole in the membrane.")
         self.composition["upper"]=comp_upper
         self.composition["lower"]=comp_lower
-        self.coords["upper"]=self.assemble(vector,comp_upper)
-        self.coords["lower"]=self.assemble(vector,comp_lower,z_dist)
+        self.coords["upper"]=self.assemble(vector, comp_upper)
+        self.coords["lower"]=self.assemble(vector, comp_lower, z_dist)
         h=self.thickness()
         self.fit_box(delta_h=h)
         # `self.update` was here
-        n=""
-        for i,_ in enumerate(self.residue_name):
-            N=0
+        n = ""
+        for i, _ in enumerate(self.residue_name):
+            N = 0
             for j in self.coords:
-                N+=self.composition[j][i]
-            n=n+str(N)+'-'
+                N += self.composition[j][i]
+            n = n + str(N) + '-'
         self.filename=['[P]-','[M]-'][len(self.residue_name)>1]+self.name+n[:-1]+'.gro'
         os.system("mkdir CellSys-%s"%(self.filename[:-4]))
-        return 0
+        return None
+    
     def thickness(self,ref=5):
         z_value=dict()
         z_value["upper"],z_value["lower"]=[],[]
@@ -528,21 +529,21 @@ if __name__=="cellsys":
     os.system("clear")
     print(package_banner)#isometric2
     print("\nAvailable Forcefields: ")
-    forcefield_folder=os.listdir("cellsys_data")
-    for i,forcefield in enumerate(forcefield_folder):
+    forcefield_folder = os.listdir("cellsys_data")
+    for i, forcefield in enumerate(forcefield_folder):
         print("%2d) \033[1;32m%s\033[0;0m"%(i+1, forcefield))
     for forcefield in forcefield_folder:
-        force_data[forcefield]={}
-        bonds_data[forcefield]={}
-        for f in os.listdir("cellsys_data/"+forcefield):
-            if f[-4:]==".itp":
-                res_analysis,bond_analysis=utills.gmx.read_itp("cellsys_data/"+forcefield+"/"+f)
+        force_data[forcefield] = {}
+        bonds_data[forcefield] = {}
+        for f in os.listdir(f"cellsys_data/{forcefield:s}"):
+            if f[-4:] == ".itp":
+                res_analysis, bond_analysis = utills.gmx.read_itp(f"cellsys_data/{forcefield:s}/{f:s}")
                 force_data[forcefield].update(res_analysis)
                 bonds_data[forcefield].update(bond_analysis)
     print("\nForcefield data")
     for forcefield in force_data:
         print("\033[1;32m%-15s\033[0;0m"%(forcefield) ,end="")
-        print("\033[1;34m",end="")
-        print(*force_data[forcefield].keys(),sep=" ")
-        print("\033[0;0m",end="")
+        print("\033[1;34m", end = "")
+        print(*force_data[forcefield].keys(), sep = " ")
+        print("\033[0;0m", end = "")
 
