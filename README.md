@@ -2,7 +2,7 @@
 An open-source tool for building initial structures for bio-membranes and drug-delivery systems. 🐍🧬  
 📝 Paper: https://onlinelibrary.wiley.com/doi/10.1002/jcc.26793  
 
-**This repository is the initial release of the software**  
+This repository is the initial release of the software.  
 
 ## Introduction
 ### Purpose
