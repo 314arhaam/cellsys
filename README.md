@@ -1,4 +1,4 @@
-# CellSys
+# CellSys 🧬
 An open-source tool for building initial structures for bio-membranes and drug-delivery systems. 🐍🧬  
 📝 Paper: https://onlinelibrary.wiley.com/doi/10.1002/jcc.26793  
 
