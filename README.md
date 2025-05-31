@@ -62,7 +62,7 @@ $ python systems.py
 ## Result
 Rendered visualization of the membrane, made using [VMD](https://www.ks.uiuc.edu/Research/vmd/) software.
 <p align="center">
-  <img src="https://github.com/314arhaam/cellsys/blob/main/graphics/dppc-dpps.png" width="400" title="DPPC/DPPS membrane">
+  <img src="https://github.com/314arhaam/cellsys/blob/main/gallery/dppc-dpps.png" width="400" title="DPPC/DPPS membrane">
 </p>
 
 ## Citation
